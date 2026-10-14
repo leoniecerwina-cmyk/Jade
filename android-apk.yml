@@ -1,0 +1,66 @@
+name: Android-APK bauen
+
+# Manuell starten: Reiter „Actions“ → „Android-APK bauen“ → „Run workflow“
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # damit die fertige APK als „Release“ zum Herunterladen veröffentlicht werden kann
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Immer denselben Signaturschlüssel benutzen (sonst lassen sich Updates nicht über die alte App installieren)
+        run: |
+          mkdir -p ~/.android
+          cp native/debug.keystore ~/.android/debug.keystore
+
+      - name: Android-SDK-Teile sicherstellen
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" > /dev/null || true
+
+      - name: APK bauen (komplett, mit Fingerabdruck + Widget)
+        id: full
+        continue-on-error: true
+        run: |
+          VERSION_CODE=${{ github.run_number }} bash native/prepare.sh
+          cd native/android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Notfall-Variante bauen (ohne Fingerabdruck/Widget), falls oben etwas schiefging
+        if: steps.full.outcome == 'failure'
+        run: |
+          rm -rf native/android native/www native/node_modules native/package-lock.json
+          LITE=1 VERSION_CODE=${{ github.run_number }} bash native/prepare.sh
+          cd native/android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: APK umbenennen
+        run: cp native/android/app/build/outputs/apk/debug/app-debug.apk Sakura-Jade.apk
+
+      - name: Als Release veröffentlichen (Download-Link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: Sakura & Jade APK ${{ github.run_number }}
+          body: |
+            Android-App zum Installieren: **Sakura-Jade.apk** unten herunterladen und öffnen.
+            Beim ersten Mal erlaubt Android die Installation aus dieser Quelle („Unbekannte Apps installieren“).
+            Variante: ${{ steps.full.outcome == 'success' && 'komplett (Fingerabdruck + Widget)' || 'LITE (ohne Fingerabdruck/Widget)' }}
+          files: Sakura-Jade.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sakura-Jade-APK
+          path: Sakura-Jade.apk

@@ -1,0 +1,7 @@
+{
+  "appId": "de.sakurajade.workflow",
+  "appName": "Sakura & Jade",
+  "webDir": "www",
+  "backgroundColor": "#F8F6F0",
+  "android": { "allowMixedContent": false }
+}
