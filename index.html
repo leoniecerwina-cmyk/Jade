@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sakura & Jade WorkFlow</title>
+<meta name="description" content="Uni, Wushu & Work – offline, lokal, privat.">
+<meta name="theme-color" content="#F8F6F0" id="theme-color">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sakura & Jade">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+<script>
+/* Theme vor dem ersten Rendern setzen (kein Aufblitzen) */
+(function(){try{var t=localStorage.getItem('sj-theme')||'auto';
+var dark=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+document.getElementById&&0;if(localStorage.getItem('sj-pin'))document.documentElement.classList.add('locked')}catch(e){}
+try{var P=JSON.parse(localStorage.getItem('sj-pal')||'null');if(P){var d=document.documentElement,m=P[d.getAttribute('data-theme')==='dark'?'dark':'light']||{};for(var k in m)d.style.setProperty(k,m[k]);if(P.z)d.style.zoom=String(P.z/100)}}catch(e){}})();
+</script>
+</head>
+<body>
+<div id="petals" aria-hidden="true"></div>
+<div id="app">
+  <aside id="side">
+    <div>
+      <div class="logo">
+        <div class="logo-mark">🌸</div>
+        <div>
+          <h1 class="cn">Sakura &amp; Jade</h1>
+          <span class="tag-gold">WorkFlow • 樱花与翡翠</span>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </div>
+    <div class="side-foot">
+      <div class="b"><span class="dot"></span>Lokal gespeichert</div>
+      <div class="row between" style="margin-top:2px"><span id="storage-line" class="muted">100 % offline</span><span class="seal">印章</span></div>
+    </div>
+  </aside>
+
+  <div id="main">
+    <header id="head">
+      <div>
+        <h2 id="page-title">Heute</h2>
+        <p class="sm muted sub" id="page-sub"></p>
+      </div>
+      <div class="row">
+        <button class="icon-btn" id="btn-install" title="App installieren" hidden>⬇️</button>
+        <button class="icon-btn" id="btn-lock" title="App sperren" aria-label="App sperren" hidden>🔒</button>
+        <button class="icon-btn" id="btn-zen" title="Zen-Modus">🧘</button>
+        <button class="icon-btn" id="btn-theme" title="Dunkelmodus umschalten" aria-label="Dunkelmodus umschalten">🌙</button>
+      </div>
+    </header>
+    <div id="view" tabindex="-1"></div>
+  </div>
+</div>
+
+<nav id="bnav"></nav>
+<button id="fab" title="Quick Capture" aria-label="Quick Capture">+</button>
+
+<div id="modal-root" role="dialog" aria-modal="true"></div>
+<div id="toast" aria-live="polite"></div>
+
+<div id="zen" aria-label="Zen-Modus"></div>
+<div id="lock" role="dialog" aria-modal="true" aria-label="App gesperrt"></div>
+
+<script src="wushu-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
